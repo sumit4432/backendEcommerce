@@ -3,36 +3,48 @@ const shortid = require("shortid");
 const slugify = require("slugify");
 const Category = require("../modals/category");
 
-exports.createProduct = (req, res) => {
-  //res.status(200).json( { file: req.files, body: req.body } );
+exports.createProduct =async (req, res) => {
+   try {
+    // Extract product data from the request body
+    const {
+      name,
+      slug,
+      price,
+      quantity,
+      description,
+      offer,
+      productPictures,
+      reviews,
+      category,
+      createdBy,
+    } = req.body;
 
-  const { name, price, description, category, quantity, createdBy } = req.body;
-  let productPictures = [];
-
-  if (req.files.length > 0) {
-    productPictures = req.files.map((file) => {
-      return { img: file.location };
+    // Create a new instance of the Product model
+    const product = new Product({
+      name,
+      slug,
+      price,
+      quantity,
+      description,
+      offer,
+      productPictures,
+      reviews,
+      category,
+      createdBy,
     });
+
+    // Save the product document to the database
+    await product.save();
+
+    // Send a success response
+    return res.status(201).json({ message: 'Product created successfully', product });
+  } catch (error) {
+    // Handle errors
+    console.error('Error creating product:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
-
-  const product = new Product({
-    name: name,
-    slug: slugify(name),
-    price,
-    quantity,
-    description,
-    productPictures,
-    category,
-    createdBy: req.user._id,
-  });
-
-  product.save((error, product) => {
-    if (error) return res.status(400).json({ error });
-    if (product) {
-      res.status(201).json({ product, files: req.files });
-    }
-  });
 };
+
 
 exports.getProductsBySlug = (req, res) => {
   const { slug } = req.params;
