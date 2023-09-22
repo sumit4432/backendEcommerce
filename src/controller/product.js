@@ -1,50 +1,42 @@
-const Product=require("../modals/product")
+const Product = require("../modals/product");
 const shortid = require("shortid");
 const slugify = require("slugify");
 const Category = require("../modals/category");
 
-exports.createProduct =async (req, res) => {
-   try {
-    // Extract product data from the request body
-    const {
-      name,
-      slug,
-      price,
-      quantity,
-      description,
-      offer,
-      productPictures,
-      reviews,
-      category,
-      createdBy,
-    } = req.body;
+exports.createProduct = async (req, res) => {
+  try {
+    const { name, price, description, category, quantity } = req.body;
+    let productPictures = [];
+    if (req.files && req.files.length > 0) {
+      productPictures = req.files.map((file) => {
+        return { img: file.filename };
+      });
+    }
 
-    // Create a new instance of the Product model
+    // Check if req.user and req.user._id are defined
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
     const product = new Product({
-      name,
-      slug,
+      name: name,
+      slug: slugify(name),
       price,
       quantity,
       description,
-      offer,
       productPictures,
-      reviews,
       category,
-      createdBy,
+      createdBy: req.user._id,
     });
 
-    // Save the product document to the database
-    await product.save();
+    const savedProduct = await product.save();
 
-    // Send a success response
-    return res.status(201).json({ message: 'Product created successfully', product });
+    res.status(201).json({ product: savedProduct, files: req.files });
   } catch (error) {
-    // Handle errors
-    console.error('Error creating product:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    console.error(error);
+    res.status(400).json({ error: error.message });
   }
 };
-
 
 exports.getProductsBySlug = (req, res) => {
   const { slug } = req.params;
@@ -112,6 +104,7 @@ exports.getProductDetailsById = (req, res) => {
 };
 
 // new update
+
 exports.deleteProductById = (req, res) => {
   const { productId } = req.body.payload;
   if (productId) {

@@ -20,12 +20,10 @@ exports.signup = async (req, res) => {
         error: "User already registered",
       });
     }
-
-    const { firstName, lastName, email, password } = req.body;
+    const { name, email, password } = req.body;
     const hash_password = await bcrypt.hash(password, 10);
     const _user = new User({
-      firstName,
-      lastName,
+      name,
       email,
       hash_password,
       username: shortid.generate(),
@@ -61,12 +59,12 @@ exports.signin = async (req, res) => {
       return res.status(400).json({ error: "Access denied" });
     }
 
-    const token = generateJwtToken(user._id, user.role);
-    const { _id, fullName, email, role } = user;
+    const token = jwt.sign({_id:user._id}, process.env.JWT_KEY,{expiresIn: "7d"});
+    const { _id, name, email, role } = user;
 
     return res.status(200).json({
       token,
-      user: { _id, fullName, email, role },
+      user: { _id, name, email, role },
     });
   } catch (error) {
     return res.status(400).json({
