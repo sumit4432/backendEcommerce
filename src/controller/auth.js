@@ -59,7 +59,7 @@ exports.signin = async (req, res) => {
       return res.status(400).json({ error: "Access denied" });
     }
 
-    const token = jwt.sign({_id:user._id}, process.env.JWT_KEY,{expiresIn: "7d"});
+    const token = jwt.sign({_id:user._id, role: user.role}, process.env.JWT_KEY,{expiresIn: "7d"});
     const { _id, name, email, role } = user;
 
     return res.status(200).json({

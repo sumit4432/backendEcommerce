@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const ConnectDB = require("./db/connect"); 
 const categoryRoutes=require("./routes/category")
 const productsRoute=require("./routes/products")
+const cartRoutes=require("./routes/cartRoutes")
 
 dotenv.config();
 ConnectDB()
@@ -15,9 +16,10 @@ ConnectDB()
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
     // Routes
-   app.use("/api", register )
-     app.use("/api", categoryRoutes)
-       app.use("/api", productsRoute)
+      app.use("/api", register )
+      app.use("/api", categoryRoutes)
+      app.use("/api", productsRoute)
+      app.use("/api", cartRoutes)
 
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

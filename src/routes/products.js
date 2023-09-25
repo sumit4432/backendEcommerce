@@ -1,5 +1,5 @@
 const express = require("express");
-const { createProduct } = require("../controller/product");
+const { createProduct, getProducts, deleteProduct, getProductsBySlug } = require("../controller/product");
 const multer = require("multer");
 const router = express.Router();
 const shortid = require("shortid");
@@ -23,5 +23,8 @@ router.post(
   upload.array("productPicture"),
   createProduct
 );
+router.get("/getAllProducts", getProducts);
+router.delete("/delete/:productId", deleteProduct)
+router.delete("/products/:slug", getProductsBySlug)
 
 module.exports = router;
