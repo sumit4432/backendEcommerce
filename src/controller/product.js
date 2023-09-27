@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const shortid = require("shortid");
 const slugify = require("slugify");
 const Category = require("../modals/category");
+const Review=require("../modals/recentReview")
 
 exports.createProduct = async (req, res) => {
   try {
@@ -90,19 +91,34 @@ exports.getProductsBySlug = (req, res) => {
     });
 };
 
-exports.getProductDetailsById = (req, res) => {
-  const { productId } = req.params;
-  if (productId) {
-    Product.findOne({ _id: productId }).exec((error, product) => {
-      if (error) return res.status(400).json({ error });
-      if (product) {
-        res.status(200).json({ product });
-      }
-    });
-  } else {
-    return res.status(400).json({ error: "Params required" });
+exports.getProductById = async (req, res) => {
+  try {
+    const productId = req.params.productId;
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Check if there is an active session and user data
+    if (req.session && req.session.user) {
+      const userId = req.session.user._id;
+
+      // Create a record in the RecentlyViewed collection
+      await Review.create({
+        user: userId,
+        product: productId,
+      });
+    }
+
+    res.status(200).json(product);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+
 
 // new update
 
