@@ -36,23 +36,20 @@ exports.addCategory = async (req, res) => {
       return res.status(400).json({ error: "Category name is required" });
     }
 
-    let category;
-    if (parentId) {
-      const parentCategory = await Category.findById(parentId);
-      if (!parentCategory) {
-        return res.status(400).json({ error: "Parent category not found" });
-      }
-      category = new Category({
-        name,
-        slug: `${slugify(name)}-${shortid.generate()}`,
-        parentId,
-      });
-    } else {
-      category = new Category({
-        name,
-        slug: `${slugify(name)}-${shortid.generate()}`,
-      });
+    const parentCategory = parentId ? await Category.findById(parentId) : null;
+
+    if (parentId && !parentCategory) {
+      return res.status(400).json({ error: "Parent category not found" });
     }
+
+    const slug = `${slugify(name)}-${shortid.generate()}`;
+
+    const category = new Category({
+      name,
+      slug,
+      type: req.body.type || "default", // Set a default type if not provided
+      parentId: parentCategory ? parentCategory._id : null,
+    });
 
     // Save the category to the database
     const savedCategory = await category.save();
@@ -64,7 +61,6 @@ exports.addCategory = async (req, res) => {
     res.status(500).json({ error: "Something went wrong" });
   }
 };
-
 
 exports.getCategories = async (req, res) => {
   try {
@@ -121,8 +117,6 @@ exports.updateCategories = async (req, res) => {
         return updatedCategory;
       })
     );
-
-    // Return the updated categories in the response
     res.status(201).json({ updatedCategories });
   } catch (error) {
     console.error(error);

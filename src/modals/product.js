@@ -5,6 +5,14 @@ const productSchema = new mongoose.Schema({
         required: true, 
         trim: true 
     },
+    brand:{
+        type:String,
+        required:true
+    },
+    type:{
+        type:String,
+        required:true
+    },
     slug: { 
         type: String, 
         required: true, 
@@ -14,6 +22,19 @@ const productSchema = new mongoose.Schema({
         type: Number, 
         required: true 
     },
+    size:{
+        type:String,
+        required:true
+    },
+    color:{
+        type:String,
+        required:true
+    },
+    about:{
+        type:String,
+        required:true
+    },
+
     quantity: {
         type: Number,
         required: true
@@ -23,6 +44,11 @@ const productSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    specification: [{
+        type: String,
+        trim: true,
+    }],
+
     offer: { type: Number },
     productPictures: [
         { img: { type: String } }

@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const shortid = require("shortid");
 const path = require("path");
+
 exports.requireSignin = (req, res, next) => {
   if (req.headers.authorization) {
     // If a JWT token is present, perform token-based authentication
@@ -16,7 +17,7 @@ exports.requireSignin = (req, res, next) => {
       return res.status(401).json({ message: "Invalid or expired token" });
     }
   } else if (req.session && req.session.user) {
-    // If no JWT token but a session with user data is present, consider the user authenticated
+
     console.log("User authenticated via session:", req.session.user);
     req.user = req.session.user;
     next();

@@ -1,11 +1,11 @@
 const express = require("express");
 const { createProduct, getProducts, deleteProduct,
-   getProductsBySlug, getProductById, updateProduct,} = require("../controller/product");
+   getProductsBySlug, getProductById, updateProduct, filterProducts} = require("../controller/product");
 const multer = require("multer");
 const router = express.Router();
 const shortid = require("shortid");
 const path = require("path");
-const { requireSignin } = require('../middleware/index');
+const { requireSignin, storeProductInView } = require('../middleware/index');
 const {getRecentlyViewedProducts } = require("../controller/recentReview");
 
 const storage = multer.diskStorage({
@@ -29,8 +29,9 @@ router.get("/getAllProducts", getProducts);
 router.delete("/delete/:productId", deleteProduct)
 router.delete("/products/:slug", getProductsBySlug)
 router.get("/product/:productId", requireSignin, getProductById);
-router.put('/update/:productId', updateProduct)
+router.put('/update/:productId', requireSignin, updateProduct)
 router.get('/reviews/recent', requireSignin, getRecentlyViewedProducts);
+router.get('/products/filter', filterProducts);
 
 module.exports = router;
 

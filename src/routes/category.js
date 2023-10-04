@@ -1,14 +1,17 @@
 const express=require("express");
-const { addCategory, getCategories } = require("../controller/category");
+const { addCategory, getCategories, updateCategories } = require("../controller/category");
+const {requireSignin}=require("../middleware/index")
 const router=express.Router();
 
 router.post(
   "/category/create",
-//   requireSignin,
+  requireSignin,
 //   superAdminMiddleware,
 //   upload.single("categoryImage"),
   addCategory
 );
-router.get("/allCategories", getCategories)
+router.get("/allCategories", getCategories);
+router.put('/update-categories', updateCategories);
+
 
 module.exports = router;
